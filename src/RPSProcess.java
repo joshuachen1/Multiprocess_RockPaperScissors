@@ -15,25 +15,14 @@ public class RPSProcess {
         // Every other process to arrive simply plays.
         try {
             Socket clientSocket = new Socket("localhost", gamePort);
-            String playerName = "Client " + numPlayers;
             int playerID = numPlayers;
             numPlayers++;
 
-            DataInputStream in = new DataInputStream(
-                                 new BufferedInputStream(clientSocket.getInputStream()));
             DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
             System.out.println("Connected successfully");
 
-            while (true) {
-                String ready = in.readUTF();
-                if (ready.equalsIgnoreCase(playerName)) {
-                    break;
-                }
-            }
-
-            System.out.println("Begin play");
-
             for (int i = 0; i < numGames; i++) {
+                System.out.println("Pick a move");
                 Thread.sleep(100 + playerID);
                 out.writeInt((int)(Math.random() * 3));
                 out.flush();
@@ -61,18 +50,11 @@ public class RPSProcess {
             DataInputStream c2Input = new DataInputStream(
                                       new BufferedInputStream(client2.getInputStream()));
 
-            DataOutputStream c1Out = new DataOutputStream(client1.getOutputStream());
-            DataOutputStream c2Out = new DataOutputStream(client2.getOutputStream());
             System.out.println("All players ready.");
 
             for (int j = 0; j < numGames; j++) {
                 int c0Choice = (int)(Math.random() * 3);
-                c1Out.writeUTF("client 1");
-                c1Out.flush();
                 int c1Choice = c1Input.read();
-
-                c2Out.writeUTF("client 2");
-                c2Out.flush();
                 int c2Choice = c2Input.read();
 
                 displayResults(c0Choice, c1Choice, c2Choice, points);
