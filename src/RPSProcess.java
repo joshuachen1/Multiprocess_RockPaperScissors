@@ -8,57 +8,56 @@ import java.util.Scanner;
  */
 public class RPSProcess {
     private static int gamePort = 1234;
-    private static int numPlayers;
+    private static int[] points = new int[3];
 
     public RPSProcess(int numGames) throws Exception {
 
         // Every other process to arrive simply plays.
         try {
-            Socket clientSocket = new Socket("localhost", gamePort);
-            int playerID = numPlayers;
-            numPlayers++;
-
-            DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
             System.out.println("Connected successfully");
 
             for (int i = 0; i < numGames; i++) {
-                System.out.println("Pick a move");
-                Thread.sleep(100 + playerID);
+                Socket clientSocket = new Socket("localhost", gamePort);
+
+                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+
                 out.writeInt((int)(Math.random() * 3));
-                out.flush();
+
+                out.close();
+                clientSocket.close();
             }
+
             System.out.println("Game over");
-            out.close();
-            clientSocket.close();
         }
         // First process to arrive becomes the host and player.
         catch(ConnectException i) {
-            ServerSocket server = new ServerSocket(gamePort);
-            numPlayers++;
+            ServerSocket hostSocket = new ServerSocket(gamePort);
 
             System.out.println("Waiting for players...");
 
-            Socket client1 = server.accept();
-            System.out.println("Added Client 1");
-            Socket client2 = server.accept();
-            System.out.println("Added Client 2");
-
-            int[] points = new int[3];
-
-            DataInputStream c1Input = new DataInputStream(
-                                      new BufferedInputStream(client1.getInputStream()));
-            DataInputStream c2Input = new DataInputStream(
-                                      new BufferedInputStream(client2.getInputStream()));
-
-            System.out.println("All players ready.");
-
             for (int j = 0; j < numGames; j++) {
-                int c0Choice = (int)(Math.random() * 3);
+                Socket client1 = hostSocket.accept();
+                Socket client2 = hostSocket.accept();
+
+                DataInputStream c1Input = new DataInputStream(
+                        new BufferedInputStream(client1.getInputStream()));
+                DataInputStream c2Input = new DataInputStream(
+                        new BufferedInputStream(client2.getInputStream()));
+
+                System.out.println("All players ready.");
+
+
+                int c0Choice = (int) (Math.random() * 3);
                 int c1Choice = c1Input.read();
                 int c2Choice = c2Input.read();
 
-                displayResults(c0Choice, c1Choice, c2Choice, points);
+                displayResults(c0Choice, c1Choice, c2Choice, points, j + 1);
+
+                client1.close();
+                client2.close();
             }
+
+            hostSocket.close();
 
             System.out.println("Total Points Won");
             System.out.println("------------------------------------");
@@ -66,12 +65,12 @@ public class RPSProcess {
                 System.out.println("Client " + j + " won a total of " + points[j] + " points!");
             }
             System.out.println("------------------------------------");
-
         }
     }
 
-    private void displayResults(int c0Choice, int c1Choice, int c2Choice, int[] points) {
+    private void displayResults(int c0Choice, int c1Choice, int c2Choice, int[] points, int round) {
         String[] rps = {"rock", "paper", "scissors"};
+        System.out.println("Game Round: " + round);
         System.out.println("------------------------------------");
         System.out.println("Client 0: " + rps[c0Choice]);
         System.out.println("Client 1: " + rps[c1Choice]);
@@ -123,9 +122,10 @@ public class RPSProcess {
     }
 
     public static void main(String[] args) throws Exception {
-        // Scanner scan = new Scanner(System.in);
-        // System.out.print("Number of Games to Play: ");
-        // new RPSProcess(scan.nextInt());
-        RPSProcess process = new RPSProcess(10);
+
+        System.out.print("Number of Games to Play: ");
+        int numGames = new Scanner(System.in).nextInt();
+
+        new RPSProcess(numGames);
     }
 }

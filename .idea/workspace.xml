@@ -24,8 +24,8 @@
       <file leaf-file-name="RPSProcess.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/RPSProcess.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="19" column="12" selection-start-line="19" selection-start-column="12" selection-end-line="19" selection-end-column="12" />
+            <state relative-caret-position="166">
+              <caret line="19" column="72" selection-start-line="19" selection-start-column="72" selection-end-line="19" selection-end-column="72" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -435,8 +435,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/RPSProcess.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="19" column="12" selection-start-line="19" selection-start-column="12" selection-end-line="19" selection-end-column="12" />
+        <state relative-caret-position="166">
+          <caret line="19" column="72" selection-start-line="19" selection-start-column="72" selection-end-line="19" selection-end-column="72" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
