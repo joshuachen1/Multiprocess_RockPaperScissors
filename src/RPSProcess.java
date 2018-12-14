@@ -16,16 +16,17 @@ public class RPSProcess {
         try {
             System.out.println("Connected successfully");
 
+            Socket clientSocket = new Socket("localhost", gamePort);
+
+            DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+
             for (int i = 0; i < numGames; i++) {
-                Socket clientSocket = new Socket("localhost", gamePort);
-
-                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-
-                out.writeInt((int)(Math.random() * 3));
-
-                out.close();
-                clientSocket.close();
+                out.writeInt((int) (Math.random() * 3));
+                out.flush();
             }
+
+            out.close();
+            clientSocket.close();
 
             System.out.println("Game over");
         }
@@ -35,28 +36,25 @@ public class RPSProcess {
 
             System.out.println("Waiting for players...");
 
+
+            Socket client1 = hostSocket.accept();
+            Socket client2 = hostSocket.accept();
+
+            DataInputStream c1Input = new DataInputStream(
+                    new BufferedInputStream(client1.getInputStream()));
+            DataInputStream c2Input = new DataInputStream(
+                    new BufferedInputStream(client2.getInputStream()));
+
             for (int j = 0; j < numGames; j++) {
-                Socket client1 = hostSocket.accept();
-                Socket client2 = hostSocket.accept();
-
-                DataInputStream c1Input = new DataInputStream(
-                        new BufferedInputStream(client1.getInputStream()));
-                DataInputStream c2Input = new DataInputStream(
-                        new BufferedInputStream(client2.getInputStream()));
-
-                System.out.println("All players ready.");
-
-
                 int c0Choice = (int) (Math.random() * 3);
                 int c1Choice = c1Input.read();
                 int c2Choice = c2Input.read();
 
                 displayResults(c0Choice, c1Choice, c2Choice, points, j + 1);
-
-                client1.close();
-                client2.close();
             }
 
+            client1.close();
+            client2.close();
             hostSocket.close();
 
             System.out.println("Total Points Won");
