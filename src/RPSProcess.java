@@ -9,6 +9,7 @@ import java.util.Scanner;
 public class RPSProcess {
     private static int gamePort = 1234;
     private static int[] points = new int[3];
+    private static String[] rps = {"rock", "paper", "scissors"};
 
     public RPSProcess(int numGames) throws Exception {
 
@@ -21,7 +22,8 @@ public class RPSProcess {
             DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
             for (int i = 0; i < numGames; i++) {
-                out.writeInt((int) (Math.random() * 3));
+                Thread.sleep(500);
+                out.writeUTF(rps[(int) (Math.random() * 3)]);
                 out.flush();
             }
 
@@ -34,11 +36,18 @@ public class RPSProcess {
         catch(ConnectException i) {
             ServerSocket hostSocket = new ServerSocket(gamePort);
 
-            System.out.println("Waiting for players...");
-
+            System.out.println("---------------------------------------");
+            System.out.println("First player to arrive. Hosting server.");
+            System.out.println("---------------------------------------");
+            System.out.println("Waiting for more players...");
+            System.out.println("---------------------------------------");
 
             Socket client1 = hostSocket.accept();
             Socket client2 = hostSocket.accept();
+
+            System.out.println("All players have arrived.");
+            System.out.println("---------------------------------------");
+
 
             DataInputStream c1Input = new DataInputStream(
                     new BufferedInputStream(client1.getInputStream()));
@@ -46,9 +55,10 @@ public class RPSProcess {
                     new BufferedInputStream(client2.getInputStream()));
 
             for (int j = 0; j < numGames; j++) {
-                int c0Choice = (int) (Math.random() * 3);
-                int c1Choice = c1Input.read();
-                int c2Choice = c2Input.read();
+                Thread.sleep(1000);
+                String c0Choice = rps[(int) (Math.random() * 3)];
+                String c1Choice = c1Input.readUTF();
+                String c2Choice = c2Input.readUTF();
 
                 displayResults(c0Choice, c1Choice, c2Choice, points, j + 1);
             }
@@ -58,18 +68,31 @@ public class RPSProcess {
             hostSocket.close();
 
             System.out.println("Total Points Won");
-            System.out.println("------------------------------------");
+            System.out.println("---------------------------------------");
             for (int j = 0; j < points.length; j++) {
                 System.out.println("Client " + j + " won a total of " + points[j] + " points!");
             }
-            System.out.println("------------------------------------");
+            System.out.println("---------------------------------------");
         }
     }
 
-    private void displayResults(int c0Choice, int c1Choice, int c2Choice, int[] points, int round) {
-        String[] rps = {"rock", "paper", "scissors"};
+    private void displayResults(String c0, String c1, String c2, int[] points, int round) {
+        int c0Choice, c1Choice, c2Choice;
+        c0Choice = c1Choice = c2Choice = 0;
+        for (int i = 0; i < rps.length; i++) {
+            if (c0.equals(rps[i])) {
+                c0Choice = i;
+            }
+            if (c1.equals(rps[i])) {
+                c1Choice = i;
+            }
+            if (c2.equals(rps[i])) {
+                c2Choice = i;
+            }
+        }
+
         System.out.println("Game Round: " + round);
-        System.out.println("------------------------------------");
+        System.out.println("---------------------------------------");
         System.out.println("Client 0: " + rps[c0Choice]);
         System.out.println("Client 1: " + rps[c1Choice]);
         System.out.println("Client 2: " + rps[c2Choice]);
@@ -116,7 +139,7 @@ public class RPSProcess {
         else {
             System.out.println("No points awarded");
         }
-        System.out.println("------------------------------------");
+        System.out.println("---------------------------------------");
     }
 
     public static void main(String[] args) throws Exception {
